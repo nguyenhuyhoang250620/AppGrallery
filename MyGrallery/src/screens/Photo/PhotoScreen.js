@@ -10,13 +10,17 @@ import {
   View,
   Text,
   Platform,
-  ActivityIndicator
+  ActivityIndicator,
+
 } from 'react-native';
 
 import CameraRoll from '@react-native-community/cameraroll';
 import Swiper from 'react-native-swiper';
 import Icon from 'react-native-vector-icons/Ionicons'
 import FastImage from 'react-native-fast-image'
+
+
+
 Icon.loadFont();
 
 const PhotoScreen = () => {
@@ -28,7 +32,7 @@ const PhotoScreen = () => {
   const [isload,setIsload] = useState(true)
 
   useEffect(() => {
-
+    
     if(Platform.OS === 'android'){
       checkPermission()
       .then(() => {
@@ -57,7 +61,7 @@ const PhotoScreen = () => {
 
   const getPhotos = async () => {
     const photos = await CameraRoll.getPhotos({
-      first: 10,
+      first: 500,
     })
 
     setNodes(photos.edges.map(edge => edge.node))
@@ -80,6 +84,7 @@ const PhotoScreen = () => {
     //   setTime([todo])
     // })
   }
+
   const getTime = (item)=>{
     nodes.map((doc,index)=>{
       if(index===item){
@@ -210,51 +215,52 @@ const PhotoScreen = () => {
         )
         : (
           <ScrollView>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-            }}
-          >
-            {
-              nodes.map(
-                (node, index) => (
-                  <TouchableOpacity
+          <View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+              }}
+            >
+              {
+                nodes.map(
+                  (node, index) => (
+                    <TouchableOpacity
 
-                    key={index}
-                    style={{
-                      height: 200,
-                      minWidth: 200,
-                      flex: 1,
-                      padding:10,
-                      borderWidth:0.5
-                    }}
-                    onPress={() => {
-                      setDetailViewVisibility(true)
-                      getTime(index)
-                      setSelectedIndex(index)
-                      console.log(node.image.uri)
-                    }}
-                  >
-                    <Image
+                      key={index}
                       style={{
                         height: 100,
                         minWidth: 100,
-                        flex: 1
+                        flex: 1,
+                        padding:10,
+                        borderWidth:0.5
                       }}
-                      resizeMode="cover"
-                      source={{
-                        uri:node.image.uri,
+                      onPress={() => {
+                        setDetailViewVisibility(true)
+                        getTime(index)
+                        setSelectedIndex(index)
+                        console.log(node.image.uri)
+                        
                       }}
-                    />
-                    <View style={{marginTop:10}}>
-                      <Text style={{fontSize:15,fontWeight:"bold"}}>{node.timestamp}</Text>
-                    </View>
-                  </TouchableOpacity>
+                    >
+                      <FastImage
+                        style={{
+                          height: 100,
+                          minWidth: 100,
+                          flex: 1
+                        }}
+                        resizeMode="cover"
+                        source={{
+                          uri:node.image.uri,
+                        }}
+                        
+                      />
+                    </TouchableOpacity>
+                  )
                 )
-              )
-            }
+              }
+            </View>
           </View>
           </ScrollView>
         )

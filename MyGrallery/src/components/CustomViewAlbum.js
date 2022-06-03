@@ -31,7 +31,7 @@ const CustomViewAlbum = (props) => {
   const [isload,setIsload] = useState(true)
 
   useEffect(() => {
-
+      
     if(Platform.OS == 'android'){
       checkPermission()
       .then(() => {
@@ -139,8 +139,8 @@ const CustomViewAlbum = (props) => {
                     />
                 </TouchableOpacity>
                 <View style={{paddingHorizontal:20}}>
-                    <Text style={{fontSize:16,fontWeight:"bold"}}>Tat ca</Text>
-                    <Text style={{fontSize:12,color:"grey"}}>500 muc</Text>
+                    <Text style={{fontSize:16,fontWeight:"bold"}}>{props.name_album}</Text>
+                    <Text style={{fontSize:12,color:"grey"}}>0 muc</Text>
                 </View>
             </View>
             {
@@ -250,38 +250,40 @@ const CustomViewAlbum = (props) => {
                     }}
                 >
                     {
-                    nodes.map(
-                        (node, index) => (
-                        <TouchableOpacity
+                        props.id_album==2&&
+                        nodes.map(
+                            (node, index) => (
+                            <TouchableOpacity
 
-                            key={index}
-                            style={{
-                            height: 100,
-                            minWidth: 100,
-                            flex: 1,
-                            padding:10,
-                            borderWidth:0.5
-                            }}
-                            onPress={() => {
-                            setDetailViewVisibility(true)
-                            getTime(index)
-                            setSelectedIndex(index)
-                            }}
-                        >
-                            <Image
-                            style={{
+                                key={index}
+                                style={{
                                 height: 100,
                                 minWidth: 100,
-                                flex: 1
-                            }}
-                            resizeMode="cover"
-                            source={{
-                                uri: node.image.uri
-                            }}
-                            />
-                        </TouchableOpacity>
+                                flex: 1,
+                                padding:10,
+                                borderWidth:0.5
+                                }}
+                                onPress={() => {
+                                setDetailViewVisibility(true)
+                                getTime(index)
+                                setSelectedIndex(index)
+                                console.log(props.album_imgs)
+                                }}
+                            >
+                                <Image
+                                style={{
+                                    height: 100,
+                                    minWidth: 100,
+                                    flex: 1
+                                }}
+                                resizeMode="cover"
+                                source={{
+                                    uri: props.album_imgs[0]
+                                }}
+                                />
+                            </TouchableOpacity>
+                            )
                         )
-                    )
                     }
                 </View>
                 </ScrollView>

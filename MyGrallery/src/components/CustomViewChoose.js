@@ -1,66 +1,49 @@
 
    
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import {
   Image,
-  PermissionsAndroid,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   View,
-  Text,
-  Platform,
-  ActivityIndicator
+  Animated
 } from 'react-native';
 
 import CameraRoll from '@react-native-community/cameraroll';
-import Swiper from 'react-native-swiper';
 import Icon from 'react-native-vector-icons/Ionicons'
-import FastImage from 'react-native-fast-image'
 Icon.loadFont();
 
-const CustomViewChose = () => {
+const CustomViewChose = (props) => {
 
+  const toggle = useRef(new Animated.Value(0)).current
   const [nodes, setNodes] = useState([]);
   const [chose,setChose] = useState(false)
+  const [check,setCheck] = useState(false)
+  const [album_img,setalbum_img] = useState([])
 
+  Animated.timing(toggle,{
+    useNativeDriver:false,
+    duration:200,
+    toValue:80
+  }).start()
   useEffect(() => {
-
-    if(Platform.OS === 'android'){
-      checkPermission()
-      .then(() => {
-        getPhotos()
-      })
-    }else{
-      getPhotos()
-    }
+    getPhotos()
   }, [])
 
-  const checkPermission = async () => {
-    const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
 
-    if (hasPermission) {
-      return true;
-    }
-
-    const status = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE, {
-      title: "Image gallery app permissions",
-      message: "Image gallery needs your permission to access your photos",
-      buttonPositive: "OK",
-    })
-
-    return status === 'granted';
+  const choseimage =()=>{
+    props.parencallbacks(false)
+    
   }
-
+  const album_imgs = ()=>{
+    props.album_img(album_img)
+  }
   const getPhotos = async () => {
     const photos = await CameraRoll.getPhotos({
       first: 10,
     })
     setNodes(photos.edges.map(edge => edge.node))
   }
-
-
-
   return (
         <View style={{
             position:"absolute",
@@ -93,7 +76,10 @@ const CustomViewChose = () => {
                         backgroundColor:index===0&&chose?"red":"white"
                         }}
                         onPress={() => {
-                            setChose(true)     
+                            setChose(true) 
+                            setCheck(true)    
+                            setalbum_img([...album_img,node.image.uri])
+                            album_imgs()
                         }}
                     >
                         <Image
@@ -113,6 +99,31 @@ const CustomViewChose = () => {
                 }
             </View>
             </ScrollView>
+            {
+              check&&
+              <Animated.View style={{
+                height:toggle,
+                width:"100%",
+                backgroundColor:"#A9A9A9",
+                position:"absolute",
+                justifyContent:"center",
+                bottom:0,
+                alignItems:"flex-end",
+                padding:20
+              }}>
+                <TouchableOpacity
+                  onPress={()=>{
+                    choseimage()
+                  }}
+                >
+                <Icon
+                    name='checkmark-outline'
+                    size={30}
+                    color="black"
+                />
+                </TouchableOpacity>
+              </Animated.View>
+            }
         </View>
   );
 };

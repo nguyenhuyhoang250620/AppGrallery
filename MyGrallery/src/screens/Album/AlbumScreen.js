@@ -11,6 +11,9 @@ import CustomButtonAddAlbum from '../../components/CustomButtonAddAlbum'
 import CustomViewAdd from '../../components/CustomViewAdd'
 import CustomViewChoose from '../../components/CustomViewChoose'
 import CustomViewAlbum from '../../components/CustomViewAlbum'
+
+
+
 const AlbumScreen = () => {
   const [data,setData] =useState([
     {
@@ -23,15 +26,11 @@ const AlbumScreen = () => {
   const [show,setShow] = useState(false)
   const [show_img,setShow_Img] = useState(false)
   const [show_chose,setShow_chose] = useState(false)
+  const [id_album,setId_album] = useState()
+  const [name_album,setname_album] = useState('')
+  const [album_imgs,setalbum_imgs] = useState([])
   const Send = childdata => {
     setShow(childdata)
-    const todo ={
-      id:2,
-      title:"them",
-      amount:9,
-      img:[]
-    }
-    setData([...data,todo])
   };
   const Send_album = childdata =>{
     setShow_Img(childdata)
@@ -39,16 +38,35 @@ const AlbumScreen = () => {
   const SaveCallBack = childdata=>{
     setShow_chose(childdata)
   }
+  const SaveCallBacks = childdata=>{
+    setShow_chose(childdata)
+  }
+  const album_img =childdata=>{
+    setalbum_imgs(childdata)
+  }
+  const Text_album = childdata=>{
+    setname_album(childdata)
+    const todo ={
+      id:2,
+      title:childdata,
+      amount:9,
+      img:album_imgs
+    }
+    setData([...data,todo])
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={[styles.container,{flexDirection:"row",flexWrap:"wrap"}]}>
+        <View style={[styles.container,{flexWrap:"wrap",flexDirection:"row"}]}>
           {
             data.map((item,index)=>(
-              <View key={index} style={[styles.container,{alignItems:"flex-start",padding:10}]}>
+              <View key={index} style={{padding:10}}>
                 <TouchableOpacity
-                  onPress={()=>setShow_Img(true)}
+                  onPress={()=>{
+                    setShow_Img(true)
+                    setId_album(index)
+                  }}
                 >
                   <View style={styles.container_album}></View>
                   <Text numberOfLines={2} style={{width:100,textAlign:"center",paddingTop:4,fontSize:15,fontWeight:"bold"}}>{item.title}</Text>
@@ -63,15 +81,15 @@ const AlbumScreen = () => {
       <CustomButtonAddAlbum onPress={()=>setShow(!show)}/>
       {
         show_chose&&
-        <CustomViewChoose/>
+        <CustomViewChoose parencallbacks={SaveCallBacks} album_img={album_img}/>
       }
       {
         show_img&&     
-          <CustomViewAlbum parencallback={Send_album}/>
+          <CustomViewAlbum parencallback={Send_album} id_album={id_album} name_album={name_album} album_imgs={album_imgs}/>
       }
       {
         show&&
-        <CustomViewAdd parentCallback={Send} SaveCallBack={SaveCallBack}/>
+        <CustomViewAdd parentCallback={Send} SaveCallBack={SaveCallBack} text_album_callback={Text_album}/>
       }
     </SafeAreaView>
   )

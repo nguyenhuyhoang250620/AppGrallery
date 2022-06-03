@@ -10,9 +10,11 @@ import {
 } from 'react-native'
 import React,{useRef,useState} from 'react'
 
+
 const CustomViewAdd = (props) => {
     const [colors,setColors] = useState(false)
     const [show,setShow] = useState(false)
+    const [txt_album,setTxt_album] = useState()
     const toggle = useRef(new Animated.Value(0)).current
     Animated.timing(toggle,
         {
@@ -24,13 +26,14 @@ const CustomViewAdd = (props) => {
         props.parentCallback(false)
     }
    
-    const SaveAsync =()=>{
+    const SaveAsync = async()=>{
         if(colors==true){
             props.SaveCallBack(true)
             props.parentCallback(false)
             Keyboard.dismiss()
             setShow(true)
         }
+        props.text_album_callback(txt_album)
         
     }
   return (
@@ -52,6 +55,7 @@ const CustomViewAdd = (props) => {
                         style={{borderBottomWidth:1,marginHorizontal:30,padding:10}}
                         autoFocus={true}
                         onChangeText={(text)=>{
+                            setTxt_album(text)
                             if(text === ""){
                                 setColors(false)
                             }else{

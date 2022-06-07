@@ -30,59 +30,10 @@ const CustomViewAlbum = (props) => {
   const [time,setTime] = useState([])
   const [isload,setIsload] = useState(true)
 
-  useEffect(() => {
-      
-    if(Platform.OS == 'android'){
-      checkPermission()
-      .then(() => {
-        getPhotos()
-      })
-    }else{
-      getPhotos()
-    }
-  }, [])
+    useEffect(()=>{
+        setNodes(props.album_imgs)
+    },[])
 
-  const checkPermission = async () => {
-    const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
-
-    if (hasPermission) {
-      return true;
-    }
-
-    const status = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE, {
-      title: "Image gallery app permissions",
-      message: "Image gallery needs your permission to access your photos",
-      buttonPositive: "OK",
-    })
-
-    return status === 'granted';
-  }
-
-  const getPhotos = async () => {
-    const photos = await CameraRoll.getPhotos({
-      first: 500,
-    })
-
-    setNodes(photos.edges.map(edge => edge.node))
-    setIsload(false)
-    // nodes.map((doc,index)=>{
-    //   var timestamp;
-    //   timestamp = doc.timestamp;
-    //   var timezone = new Date(timestamp*1000)
-    //   var day = timezone.getDay()
-    //   var month = timezone.getMonth()
-    //   var hours = timezone.getHours()
-    //   var minutes = timezone.getMinutes()
-      
-    //   var todo = {
-    //     day:day,
-    //     month:month,
-    //     hours:hours,
-    //     minutes:minutes
-    //   }
-    //   setTime([todo])
-    // })
-  }
   const getTime = (item)=>{
     nodes.map((doc,index)=>{
       if(index===item){
@@ -119,10 +70,7 @@ const CustomViewAlbum = (props) => {
         }),
         backgroundColor:"white"
     }}>
-        {
-            isload 
-            ? <ActivityIndicator size={40} color="black"/>
-            :<SafeAreaView style={{flex:1}}>
+       <SafeAreaView style={{flex:1}}>
             <View style={{
                 height:"10%",
                 flexDirection:"row",
@@ -191,7 +139,7 @@ const CustomViewAlbum = (props) => {
                                 }}
                                 resizeMode="cover"
                                 source={{
-                                uri: node.image.uri
+                                uri: node
                                 }}
                             />
                             
@@ -242,56 +190,52 @@ const CustomViewAlbum = (props) => {
                 )
                 : (
                 <ScrollView>
-                <View
-                    style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    }}
-                >
                     {
-                        props.id_album==2&&
-                        nodes.map(
-                            (node, index) => (
-                            <TouchableOpacity
-
+                        nodes.map((item,index)=>(
+                            <View
                                 key={index}
                                 style={{
-                                height: 100,
-                                minWidth: 100,
                                 flex: 1,
-                                padding:10,
-                                borderWidth:0.5
-                                }}
-                                onPress={() => {
-                                setDetailViewVisibility(true)
-                                getTime(index)
-                                setSelectedIndex(index)
-                                console.log(props.album_imgs)
+                                flexDirection: 'row',
+                                flexWrap: 'wrap',
                                 }}
                             >
-                                <Image
-                                style={{
+                                <TouchableOpacity
+
+                                    style={{
                                     height: 100,
                                     minWidth: 100,
-                                    flex: 1
-                                }}
-                                resizeMode="cover"
-                                source={{
-                                    uri: props.album_imgs[0]
-                                }}
-                                />
-                            </TouchableOpacity>
-                            )
-                        )
+                                    flex: 1,
+                                    padding:10,
+                                    borderWidth:0.5
+                                    }}
+                                    onPress={() => {
+                                    setDetailViewVisibility(true)
+                                    getTime(index)
+                                    setSelectedIndex(index)
+                                    
+                                    }}
+                                >
+                                    <Image
+                                    style={{
+                                        height: 100,
+                                        minWidth: 100,
+                                        flex: 1
+                                    }}
+                                    resizeMode="cover"
+                                    source={{
+                                        uri:item
+                                    }}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        ))
                     }
-                </View>
                 </ScrollView>
                 )
             }
    
         </SafeAreaView>
-        }
         
     </Animated.View>
   )

@@ -11,6 +11,7 @@ import CustomButtonAddAlbum from '../../components/CustomButtonAddAlbum'
 import CustomViewAdd from '../../components/CustomViewAdd'
 import CustomViewChoose from '../../components/CustomViewChoose'
 import CustomViewAlbum from '../../components/CustomViewAlbum'
+import CameraRoll, { getAlbums } from '@react-native-community/cameraroll'
 
 
 
@@ -29,6 +30,10 @@ const AlbumScreen = () => {
   const [id_album,setId_album] = useState()
   const [name_album,setname_album] = useState('')
   const [album_imgs,setalbum_imgs] = useState([])
+  
+  useEffect(()=>{
+    getAlbums()
+  },[])
   const Send = childdata => {
     setShow(childdata)
   };
@@ -54,7 +59,24 @@ const AlbumScreen = () => {
     }
     setData([...data,todo])
   }
+  const Text_albums = (name)=>{
+    setname_album(name)
+    const todo ={
+      id:2,
+      title:name,
+      amount:9,
+      img:album_imgs
+    }
+    // setData([...data,todo])
+  }
 
+  const getAlbums = async()=>{
+    const album = await CameraRoll.getAlbums({assetType:"Photos"})
+    console.log(album)
+    album.map(doc=>{
+      Text_albums(doc)
+    })
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -77,11 +99,14 @@ const AlbumScreen = () => {
           }
           
         </View>
+        <TouchableOpacity onPress={()=>getAlbums()}>
+          <Text>sada</Text>
+        </TouchableOpacity>
       </ScrollView>
       <CustomButtonAddAlbum onPress={()=>setShow(!show)}/>
       {
         show_chose&&
-        <CustomViewChoose parencallbacks={SaveCallBacks} album_img={album_img}/>
+        <CustomViewChoose parencallbacks={SaveCallBacks} album_img={album_img} name_album={name_album}  />
       }
       {
         show_img&&     

@@ -36,6 +36,7 @@ const CustomViewAdd = (props) => {
         props.text_album_callback(txt_album)
         
     }
+ 
   return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}

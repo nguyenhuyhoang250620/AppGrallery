@@ -6,7 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  Animated
+  Animated,
+  PermissionsAndroid
 } from 'react-native';
 
 import CameraRoll from '@react-native-community/cameraroll';
@@ -20,6 +21,7 @@ const CustomViewChose = (props) => {
   const [chose,setChose] = useState(false)
   const [check,setCheck] = useState(false)
   const [album_img,setalbum_img] = useState([])
+  const [imgs,setimgs] = useState()
 
   Animated.timing(toggle,{
     useNativeDriver:false,
@@ -30,20 +32,51 @@ const CustomViewChose = (props) => {
     getPhotos()
   }, [])
 
+  useEffect(()=>{
+    album_imgs()
+  },[album_img])
 
   const choseimage =()=>{
     props.parencallbacks(false)
+    
     
   }
   const album_imgs = ()=>{
     props.album_img(album_img)
   }
+
   const getPhotos = async () => {
     const photos = await CameraRoll.getPhotos({
       first: 10,
     })
     setNodes(photos.edges.map(edge => edge.node))
   }
+  const checkAndroidPermission = async () => {
+    try {
+      const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+      await PermissionsAndroid.request(permission);
+      Promise.resolve();
+    } catch (error) {
+      Promise.reject(error);
+    }
+};
+
+
+const savePicture = async () => {
+    if (Platform.OS === 'android'){
+      await checkAndroidPermission();
+    }
+    album_img.map(doc=>{
+      CameraRoll.save(doc,{type:"photo",album:props.name_album}).
+      then((res)=>{console.log("save img...",res);}).
+      catch((err)=>{console.log("err for save img...",err);})
+    })
+    
+    
+};
+
+ 
+  
   return (
         <View style={{
             position:"absolute",
@@ -79,7 +112,8 @@ const CustomViewChose = (props) => {
                             setChose(true) 
                             setCheck(true)    
                             setalbum_img([...album_img,node.image.uri])
-                            album_imgs()
+                            console.log(album_img)
+                            
                         }}
                     >
                         <Image
@@ -113,7 +147,10 @@ const CustomViewChose = (props) => {
               }}>
                 <TouchableOpacity
                   onPress={()=>{
-                    choseimage()
+                    // choseimage()
+                    console.log("hoang")
+                    savePicture()
+                    // console.log(album_img)
                   }}
                 >
                 <Icon

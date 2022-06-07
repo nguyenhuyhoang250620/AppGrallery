@@ -59,6 +59,7 @@ const PhotoScreen = () => {
     return status === 'granted';
   }
 
+
   const getPhotos = async () => {
     const photos = await CameraRoll.getPhotos({
       first: 500,
@@ -244,7 +245,7 @@ const PhotoScreen = () => {
                         
                       }}
                     >
-                      <FastImage
+                      <Image
                         style={{
                           height: 100,
                           minWidth: 100,

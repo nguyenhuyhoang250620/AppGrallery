@@ -18,7 +18,7 @@ import CameraRoll from '@react-native-community/cameraroll';
 import Swiper from 'react-native-swiper';
 import Icon from 'react-native-vector-icons/Ionicons'
 import FastImage from 'react-native-fast-image'
-
+import RNFS  from 'react-native-fs'
 
 
 Icon.loadFont();
@@ -30,9 +30,9 @@ const PhotoScreen = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [time,setTime] = useState([])
   const [isload,setIsload] = useState(true)
+ 
 
   useEffect(() => {
-    
     if(Platform.OS === 'android'){
       checkPermission()
       .then(() => {
@@ -42,6 +42,41 @@ const PhotoScreen = () => {
       getPhotos()
     }
   }, [])
+  
+
+  const changeURL = (img)=>{
+    // const destination = `${RNFS.CachesDirectoryPath}${Math.random().toString(36).substring(7)}.png`;
+    // try {
+    //   var array = [];
+    //   array.push(img);
+    //   array.map(async(item)=>{
+    //     let absolutePath =await RNFS.copyAssetsFileIOS(item, destination, 0, 0);
+    //   })
+    // } catch(error) {
+    //   console.log(error)
+    // } 
+    // // console.log("hoang")
+    // console.log(destination)
+    // return destination;
+
+
+
+    console.log(img)
+    const destPath = RNFS.LibraryDirectoryPath+'/MyPic.png';
+    try {
+      var array = []
+      array.push(img)
+      array.map(async doc=>{
+        await RNFS.copyAssetsFileIOS(doc, destPath,0,0);
+        console.log(destPath)
+      })
+    } 
+    catch (error) {console.log(error);} 
+    return destPath;
+  }
+  
+  
+
 
   const checkPermission = async () => {
     const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
@@ -243,20 +278,23 @@ const PhotoScreen = () => {
                         setSelectedIndex(index)
                         console.log(node.image.uri)
                         
+                        
                       }}
                     >
-                      <Image
-                        style={{
-                          height: 100,
-                          minWidth: 100,
-                          flex: 1
-                        }}
-                        resizeMode="cover"
-                        source={{
-                          uri:node.image.uri,
-                        }}
-                        
-                      />
+                          <FastImage
+                            style={{
+                              height: 100,
+                              minWidth: 100,
+                              flex: 1
+                            }}
+                            resizeMode={FastImage.resizeMode.cover}
+                            source={{
+                              uri:Platform.OS =="ios"?changeURL(node.image.uri):node.image.uri,
+                              headers: { Authorization: 'someAuthToken' },
+                              priority: FastImage.priority.high,
+                              cache:FastImage.cacheControl.immutable
+                            }}
+                          />
                     </TouchableOpacity>
                   )
                 )

@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   View,
   Animated,
-  PermissionsAndroid
+  PermissionsAndroid,
+  Platform
 } from 'react-native';
-
+import RNFS  from 'react-native-fs'
 import CameraRoll from '@react-native-community/cameraroll';
 import Icon from 'react-native-vector-icons/Ionicons'
 Icon.loadFont();
@@ -60,14 +61,26 @@ const CustomViewChose = (props) => {
       Promise.reject(error);
     }
 };
-
+const changeURL = (img)=>{
+  const destination = `${RNFS.CachesDirectoryPath}${Math.random().toString(36).substring(7)}.png`;
+  try {
+    var array = [];
+    array.push(img);
+    array.map(async(item)=>{
+      let absolutePath =await RNFS.copyAssetsFileIOS(item, destination, 0, 0);
+    })
+  } catch(error) {
+    console.log(error)
+  } 
+  return destination;
+}
 
 const savePicture = async () => {
     if (Platform.OS === 'android'){
       await checkAndroidPermission();
     }
     album_img.map(doc=>{
-      CameraRoll.save(doc,{type:"photo",album:props.name_album}).
+      CameraRoll.save(Platform.OS == "ios"?changeURL(doc):doc,{type:"photo",album:props.name_album}).
       then((res)=>{console.log("save img...",res);}).
       catch((err)=>{console.log("err for save img...",err);})
     })
@@ -147,7 +160,7 @@ const savePicture = async () => {
               }}>
                 <TouchableOpacity
                   onPress={()=>{
-                    // choseimage()
+                    choseimage()
                     console.log("hoang")
                     savePicture()
                     // console.log(album_img)

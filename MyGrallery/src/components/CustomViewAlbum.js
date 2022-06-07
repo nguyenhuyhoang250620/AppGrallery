@@ -30,9 +30,61 @@ const CustomViewAlbum = (props) => {
   const [time,setTime] = useState([])
   const [isload,setIsload] = useState(true)
 
-    useEffect(()=>{
-        setNodes(props.album_imgs)
-    },[])
+  useEffect(() => {
+    if(Platform.OS === 'android'){
+      checkPermission()
+      .then(() => {
+        getPhotos()
+      })
+    }else{
+      getPhotos()
+    }
+  }, [])
+
+    const checkPermission = async () => {
+        const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+    
+        if (hasPermission) {
+          return true;
+        }
+    
+        const status = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE, {
+          title: "Image gallery app permissions",
+          message: "Image gallery needs your permission to access your photos",
+          buttonPositive: "OK",
+        })
+    
+        return status === 'granted';
+      }
+    
+    
+      const getPhotos = async () => {
+        const photos = await CameraRoll.getPhotos({
+          first: 500,
+          groupName:props.name_album,
+          groupTypes:"Library"
+        })
+        setNodes(photos.edges.map(edge => edge.node))
+        console.log(nodes)
+        // nodes.map((doc,index)=>{
+        //   var timestamp;
+        //   timestamp = doc.timestamp;
+        //   var timezone = new Date(timestamp*1000)
+        //   var day = timezone.getDay()
+        //   var month = timezone.getMonth()
+        //   var hours = timezone.getHours()
+        //   var minutes = timezone.getMinutes()
+          
+        //   var todo = {
+        //     day:day,
+        //     month:month,
+        //     hours:hours,
+        //     minutes:minutes
+        //   }
+        //   setTime([todo])
+        // })
+      }
+    
 
   const getTime = (item)=>{
     nodes.map((doc,index)=>{
@@ -139,7 +191,7 @@ const CustomViewAlbum = (props) => {
                                 }}
                                 resizeMode="cover"
                                 source={{
-                                uri: node
+                                uri: node.image.uri
                                 }}
                             />
                             
@@ -203,7 +255,7 @@ const CustomViewAlbum = (props) => {
                                 <TouchableOpacity
 
                                     style={{
-                                    height: 100,
+                                    height: 200,
                                     minWidth: 100,
                                     flex: 1,
                                     padding:10,
@@ -224,7 +276,7 @@ const CustomViewAlbum = (props) => {
                                     }}
                                     resizeMode="cover"
                                     source={{
-                                        uri:item
+                                        uri:item.image.uri
                                     }}
                                     />
                                 </TouchableOpacity>

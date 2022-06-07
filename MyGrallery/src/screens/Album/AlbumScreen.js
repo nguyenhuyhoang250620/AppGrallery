@@ -16,24 +16,19 @@ import CameraRoll, { getAlbums } from '@react-native-community/cameraroll'
 
 
 const AlbumScreen = () => {
-  const [data,setData] =useState([
-    {
-      id:1,
-      title:"Tat ca",
-      amount:6,
-      img:[]
-    }
-  ])
+  const [data,setData] =useState([])
   const [show,setShow] = useState(false)
   const [show_img,setShow_Img] = useState(false)
   const [show_chose,setShow_chose] = useState(false)
   const [id_album,setId_album] = useState()
-  const [name_album,setname_album] = useState('')
+  const [name_album,setname_album] = useState()
   const [album_imgs,setalbum_imgs] = useState([])
+
   
   useEffect(()=>{
     getAlbums()
   },[])
+  
   const Send = childdata => {
     setShow(childdata)
   };
@@ -59,23 +54,21 @@ const AlbumScreen = () => {
     }
     setData([...data,todo])
   }
-  const Text_albums = (name)=>{
-    setname_album(name)
-    const todo ={
-      id:2,
-      title:name,
-      amount:9,
-      img:album_imgs
-    }
-    // setData([...data,todo])
-  }
+  // const Text_albums = (name)=>{
+  //   setname_album(name)
+  //   const todo ={
+  //     id:2,
+  //     title:name,
+  //     amount:9,
+  //     img:album_imgs
+  //   }
+  //   // setData([...data,todo])
+  // }
 
   const getAlbums = async()=>{
     const album = await CameraRoll.getAlbums({assetType:"Photos"})
     console.log(album)
-    album.map(doc=>{
-      Text_albums(doc)
-    })
+    setData(album)
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -88,20 +81,18 @@ const AlbumScreen = () => {
                   onPress={()=>{
                     setShow_Img(true)
                     setId_album(index)
+                    setname_album(item.title)
                   }}
                 >
                   <View style={styles.container_album}></View>
                   <Text numberOfLines={2} style={{width:100,textAlign:"center",paddingTop:4,fontSize:15,fontWeight:"bold"}}>{item.title}</Text>
-                  <Text style={{fontSize:12,color:"grey",textAlign:"center"}}>{item.amount}</Text>
+                  <Text style={{fontSize:12,color:"grey",textAlign:"center"}}>{item.count}</Text>
                 </TouchableOpacity>
               </View>
             ))
           }
           
         </View>
-        <TouchableOpacity onPress={()=>getAlbums()}>
-          <Text>sada</Text>
-        </TouchableOpacity>
       </ScrollView>
       <CustomButtonAddAlbum onPress={()=>setShow(!show)}/>
       {

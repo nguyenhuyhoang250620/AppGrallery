@@ -30,6 +30,7 @@ const PhotoScreen = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [time,setTime] = useState([])
   const [isload,setIsload] = useState(true)
+  const [test,setTest] = useState([])
  
 
   useEffect(() => {
@@ -39,12 +40,14 @@ const PhotoScreen = () => {
         getPhotos()
       })
     }else{
+      changeURL()
       getPhotos()
-    }
-  }, [])
+    }    
+  },[])
+
   
 
-  const changeURL = (img)=>{
+  const changeURL = async ()=>{
     // const destination = `${RNFS.CachesDirectoryPath}${Math.random().toString(36).substring(7)}.png`;
     // try {
     //   var array = [];
@@ -58,26 +61,25 @@ const PhotoScreen = () => {
     // // console.log("hoang")
     // console.log(destination)
     // return destination;
-
-
-
-    console.log(img)
-    const destPath = RNFS.LibraryDirectoryPath+'/MyPic.png';
-    try {
-      var array = []
-      array.push(img)
-      array.map(async doc=>{
-        await RNFS.copyAssetsFileIOS(doc, destPath,0,0);
-        console.log(destPath)
-      })
-    } 
-    catch (error) {console.log(error);} 
-    return destPath;
+    
+    // const destination = `${RNFS.CachesDirectoryPath}${Math.random().toString(36).substring(7)}.png`;
+    const photos = await CameraRoll.getPhotos({
+      first: 500,
+    })
+    var arr = []
+    photos.edges.map(async (edge) =>{
+      const destination = `${RNFS.CachesDirectoryPath}${Math.random().toString(36).substring(7)}.png`;
+      // console.log(edge.node.image.uri)
+      let absolutePath =await RNFS.copyAssetsFileIOS(edge.node.image.uri, destination, 0, 0);
+        var todo = {
+          id:Math.random(),
+          uri:absolutePath
+        }
+      arr.push(todo)
+      setTest(arr)
+    }) 
+    // console.log(test)
   }
-  
-  
-
-
   const checkPermission = async () => {
     const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
 
@@ -99,8 +101,8 @@ const PhotoScreen = () => {
     const photos = await CameraRoll.getPhotos({
       first: 500,
     })
-
     setNodes(photos.edges.map(edge => edge.node))
+    console.log(nodes)
     setIsload(false)
     // nodes.map((doc,index)=>{
     //   var timestamp;
@@ -196,7 +198,8 @@ const PhotoScreen = () => {
                       <Image
                         style={{
                           width: "100%",
-                          flex: 1,
+                          flex:1,
+                      
                         }}
                         resizeMode="cover"
                         source={{
@@ -260,7 +263,41 @@ const PhotoScreen = () => {
               }}
             >
               {
-                nodes.map(
+                Platform.OS =="ios"
+                ?
+                test.map((item,index)=>(
+                  <TouchableOpacity
+                    key={index}
+                      style={{
+                        height: 100,
+                        minWidth: 100,
+                        flex: 1,
+                        padding:10,
+                        borderWidth:0.5
+                      }}
+                      onPress={() => {
+                        setDetailViewVisibility(true)
+                        getTime(index)
+                        setSelectedIndex(index)
+                        
+                      }}
+                    >
+                          <FastImage
+                            style={{
+                              height: 100,
+                              minWidth: 100,
+                              flex: 1
+                            }}
+                            resizeMode={FastImage.resizeMode.cover}
+                            source={{
+                              uri:item.uri,
+                              priority: FastImage.priority.normal,
+                              cache:FastImage.cacheControl.immutable
+                            }}
+                          />
+                    </TouchableOpacity>
+                ))
+                :nodes.map(
                   (node, index) => (
                     <TouchableOpacity
 
@@ -289,7 +326,7 @@ const PhotoScreen = () => {
                             }}
                             resizeMode={FastImage.resizeMode.cover}
                             source={{
-                              uri:Platform.OS =="ios"?changeURL(node.image.uri):node.image.uri,
+                              uri:node.image.uri,
                               headers: { Authorization: 'someAuthToken' },
                               priority: FastImage.priority.high,
                               cache:FastImage.cacheControl.immutable

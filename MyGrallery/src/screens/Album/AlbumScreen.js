@@ -4,7 +4,8 @@ import {
   View,
   ScrollView,
   SafeAreaView,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from 'react-native'
 import React,{useState,useEffect} from 'react'
 import CustomButtonAddAlbum from '../../components/CustomButtonAddAlbum'
@@ -12,7 +13,6 @@ import CustomViewAdd from '../../components/CustomViewAdd'
 import CustomViewChoose from '../../components/CustomViewChoose'
 import CustomViewAlbum from '../../components/CustomViewAlbum'
 import CameraRoll, { getAlbums } from '@react-native-community/cameraroll'
-
 
 
 const AlbumScreen = () => {
@@ -23,7 +23,9 @@ const AlbumScreen = () => {
   const [id_album,setId_album] = useState()
   const [name_album,setname_album] = useState()
   const [album_imgs,setalbum_imgs] = useState([])
+  const [avatar,setAvatar] = useState([])
 
+  
   
   useEffect(()=>{
     getAlbums()
@@ -67,8 +69,21 @@ const AlbumScreen = () => {
 
   const getAlbums = async()=>{
     const album = await CameraRoll.getAlbums({assetType:"Photos"})
-    console.log(album)
-    setData(album)
+    // console.log(album)
+    setData(album) 
+    album.map(doc=>{
+      getPhotos(doc.title)
+    })
+  
+    
+  }
+  const getPhotos = async(name)=>{
+    const photos = await CameraRoll.getPhotos({
+      first:1,
+      groupName:name,
+      groupTypes:"Library"
+    })  
+    setAvatar(photos.edges.map(doc=>doc.node))
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -82,9 +97,15 @@ const AlbumScreen = () => {
                     setShow_Img(true)
                     setId_album(index)
                     setname_album(item.title)
+                    console.log(avatar)
                   }}
                 >
-                  <View style={styles.container_album}></View>
+                  {
+                    avatar.map((doc,key)=>{
+                      return(<Image key={key} style={styles.container_album} source={{uri:doc.image.uri}} />)
+                    })
+                  }
+                  
                   <Text numberOfLines={2} style={{width:100,textAlign:"center",paddingTop:4,fontSize:15,fontWeight:"bold"}}>{item.title}</Text>
                   <Text style={{fontSize:12,color:"grey",textAlign:"center"}}>{item.count}</Text>
                 </TouchableOpacity>
@@ -121,8 +142,6 @@ const styles = StyleSheet.create({
   container_album:{
     height:100,
     width:100,
-    backgroundColor:"black",
-    opacity:0.6,
     borderRadius:15
   },
   

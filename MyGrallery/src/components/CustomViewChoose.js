@@ -80,7 +80,7 @@ const savePicture = async () => {
       await checkAndroidPermission();
     }
     album_img.map(doc=>{
-      CameraRoll.save(Platform.OS == "ios"?changeURL(doc):doc,{type:"photo",album:props.name_album}).
+      CameraRoll.save(Platform.OS == "ios"?changeURL(doc):doc,{type:"auto",album:props.name_album}).
       then((res)=>{console.log("save img...",res);}).
       catch((err)=>{console.log("err for save img...",err);})
     })

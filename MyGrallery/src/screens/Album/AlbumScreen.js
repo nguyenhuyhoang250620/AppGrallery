@@ -24,8 +24,8 @@ const AlbumScreen = () => {
   const [name_album,setname_album] = useState()
   const [album_imgs,setalbum_imgs] = useState([])
   const [avatar,setAvatar] = useState([])
-
-  
+  const [count,setCount] = useState()
+  var arr = []
   
   useEffect(()=>{
     getAlbums()
@@ -49,33 +49,24 @@ const AlbumScreen = () => {
   const Text_album = childdata=>{
     setname_album(childdata)
     const todo ={
-      id:2,
+      id:Math.random(),
       title:childdata,
-      amount:9,
+      count:count,
       img:album_imgs
     }
     setData([...data,todo])
   }
-  // const Text_albums = (name)=>{
-  //   setname_album(name)
-  //   const todo ={
-  //     id:2,
-  //     title:name,
-  //     amount:9,
-  //     img:album_imgs
-  //   }
-  //   // setData([...data,todo])
-  // }
-
+ 
   const getAlbums = async()=>{
     const album = await CameraRoll.getAlbums({assetType:"Photos"})
     // console.log(album)
-    setData(album) 
+    
     album.map(doc=>{
       getPhotos(doc.title)
+      setCount(doc.count)
     })
-  
-    
+    setData(album) 
+
   }
   const getPhotos = async(name)=>{
     const photos = await CameraRoll.getPhotos({
@@ -83,14 +74,21 @@ const AlbumScreen = () => {
       groupName:name,
       groupTypes:"Library"
     })  
-    setAvatar(photos.edges.map(doc=>doc.node))
+    photos.edges.map(doc=>{
+      
+      // console.log(doc.node.image.uri)
+      arr.push(doc.node.image.uri)
+      
+    })
+    setAvatar([...avatar,...arr])
+    
   }
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={[styles.container,{flexWrap:"wrap",flexDirection:"row"}]}>
           {
-            data.map((item,index)=>(
+            avatar.map((item,index)=>(
               <View key={index} style={{padding:10}}>
                 <TouchableOpacity
                   onPress={()=>{
@@ -100,12 +98,8 @@ const AlbumScreen = () => {
                     console.log(avatar)
                   }}
                 >
-                  {
-                    avatar.map((doc,key)=>{
-                      return(<Image key={key} style={styles.container_album} source={{uri:doc.image.uri}} />)
-                    })
-                  }
                   
+                  <Image style={styles.container_album} source={{uri:item}} />
                   <Text numberOfLines={2} style={{width:100,textAlign:"center",paddingTop:4,fontSize:15,fontWeight:"bold"}}>{item.title}</Text>
                   <Text style={{fontSize:12,color:"grey",textAlign:"center"}}>{item.count}</Text>
                 </TouchableOpacity>
@@ -126,7 +120,7 @@ const AlbumScreen = () => {
       }
       {
         show&&
-        <CustomViewAdd parentCallback={Send} SaveCallBack={SaveCallBack} text_album_callback={Text_album}/>
+        <CustomViewAdd parentCallback={Send} SaveCallBack={SaveCallBack} text_album_callback={Text_album} name_album={name_album}/>
       }
     </SafeAreaView>
   )

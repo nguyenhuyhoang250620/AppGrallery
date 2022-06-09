@@ -38,9 +38,7 @@ const CustomViewChose = (props) => {
   },[album_img])
 
   const choseimage =()=>{
-    props.parencallbacks(false)
-    
-    
+    props.parencallbacks(false)  
   }
   const album_imgs = ()=>{
     props.album_img(album_img)
@@ -61,13 +59,14 @@ const CustomViewChose = (props) => {
       Promise.reject(error);
     }
 };
-const changeURL = (img)=>{
+const changeURL =(img)=>{
   const destination = `${RNFS.CachesDirectoryPath}${Math.random().toString(36).substring(7)}.png`;
   try {
     var array = [];
     array.push(img);
     array.map(async(item)=>{
       let absolutePath =await RNFS.copyAssetsFileIOS(item, destination, 0, 0);
+      console.log(absolutePath)
     })
   } catch(error) {
     console.log(error)
@@ -79,8 +78,8 @@ const savePicture = async () => {
     if (Platform.OS === 'android'){
       await checkAndroidPermission();
     }
-    album_img.map(doc=>{
-      CameraRoll.save(Platform.OS == "ios"?changeURL(doc):doc,{type:"auto",album:props.name_album}).
+    album_img.map( doc=>{
+      CameraRoll.save(Platform.OS == "ios"? changeURL(doc):doc,{type:"auto",album:props.name_album}).
       then((res)=>{console.log("save img...",res);}).
       catch((err)=>{console.log("err for save img...",err);})
     })

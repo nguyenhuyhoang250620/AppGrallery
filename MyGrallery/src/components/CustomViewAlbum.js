@@ -66,23 +66,6 @@ const CustomViewAlbum = (props) => {
         })
         setNodes(photos.edges.map(edge => edge.node))
         console.log(nodes)
-        // nodes.map((doc,index)=>{
-        //   var timestamp;
-        //   timestamp = doc.timestamp;
-        //   var timezone = new Date(timestamp*1000)
-        //   var day = timezone.getDay()
-        //   var month = timezone.getMonth()
-        //   var hours = timezone.getHours()
-        //   var minutes = timezone.getMinutes()
-          
-        //   var todo = {
-        //     day:day,
-        //     month:month,
-        //     hours:hours,
-        //     minutes:minutes
-        //   }
-        //   setTime([todo])
-        // })
       }
     
 

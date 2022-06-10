@@ -46,17 +46,17 @@ const PhotoScreen = () => {
     }    
   },[])
 
-  useEffect(()=>{
-    Image.getSize(
-      "ph://43AD6930-13E6-408D-BA7C-6F8D8ED37DD5/L0/001",
-      (srcWidth, srcHeight) => {
-        const ratio = Math.min(100 / srcWidth, 100 / srcHeight);
-        setTest({ height: srcHeight * ratio });
-      },
-      error => console.log(error)
-    );
-    console.log(test)
-  },[])
+  // useEffect(()=>{
+  //   Image.getSize(
+  //     "ph://43AD6930-13E6-408D-BA7C-6F8D8ED37DD5/L0/001",
+  //     (srcWidth, srcHeight) => {
+  //       const ratio = Math.min(100 / srcWidth, 100 / srcHeight);
+  //       setTest({ height: srcHeight * ratio });
+  //     },
+  //     error => console.log(error)
+  //   );
+  //   console.log(test)
+  // },[])
   
   const checkPermission = async () => {
     const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);

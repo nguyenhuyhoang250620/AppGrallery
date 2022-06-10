@@ -8,7 +8,8 @@ import {
   View,
   Animated,
   PermissionsAndroid,
-  Platform
+  Platform,
+  Text
 } from 'react-native';
 import RNFS  from 'react-native-fs'
 import CameraRoll from '@react-native-community/cameraroll';
@@ -17,20 +18,15 @@ Icon.loadFont();
 
 const CustomViewChose = (props) => {
 
-  const toggle = useRef(new Animated.Value(0)).current
-  const [nodes, setNodes] = useState([]);
-  const [chose,setChose] = useState(false)
-  const [check,setCheck] = useState(false)
-  const [album_img,setalbum_img] = useState([])
-  const [imgs,setimgs] = useState()
 
-  Animated.timing(toggle,{
-    useNativeDriver:false,
-    duration:200,
-    toValue:80
-  }).start()
+  const [nodes, setNodes] = useState([]);
+  const [album_img,setalbum_img] = useState([])
+  
+
+
   useEffect(() => {
     getPhotos()
+     
   }, [])
 
   useEffect(()=>{
@@ -86,6 +82,20 @@ const savePicture = async () => {
     
     
 };
+const Deletearr =(img,array)=>{
+  const arr = array.filter(item=>item!==img)
+  setalbum_img(arr)
+}
+const Check=(img,array)=>{
+  let count = 0;
+  for(let i=0;i<array.length;i++){
+    if(array[i]==img){
+      count++;
+      break
+    }
+  }
+  return (count>0)?true:false
+}
 
  
   
@@ -97,6 +107,44 @@ const savePicture = async () => {
              bottom:0,
              backgroundColor:"#F0F0F0"
         }}>
+              <View style={{
+                height:100,
+                width:"100%",
+                backgroundColor:"#F8F8F8",
+                flexDirection:"row",
+                justifyContent:"space-between",
+                alignItems:"center",
+                padding:20
+              }}>
+                <View style={{flexDirection:"row",alignItems:"center"}} >
+                  <TouchableOpacity
+                    onPress={()=>{
+                      choseimage()
+                    }}
+                  >
+                  <Icon
+                      name='close-outline'
+                      size={30}
+                      color="black"
+                  />
+                  </TouchableOpacity>
+                  <Text>{album_img.length>0?`Đã chọn ${album_img.length} mục`:"Chọn mục"}</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={()=>{
+                    choseimage()
+                    savePicture()
+                    console.log(album_img)
+                  }}
+                >
+                <Icon
+                    style={{opacity:album_img.length>0?1:0.1}}
+                    name='checkmark-outline'
+                    size={30}
+                    color="black"
+                />
+                </TouchableOpacity>
+              </View>
             <ScrollView>
             <View
                 style={{
@@ -118,61 +166,52 @@ const savePicture = async () => {
                         flex: 1,
                         padding:10,
                         borderWidth:0.5,
-                        backgroundColor:index===0&&chose?"red":"white"
+                        backgroundColor:"white"
                         }}
                         onPress={() => {
-                            setChose(true) 
-                            setCheck(true)    
+                          if(Check(node.image.uri,album_img)){
+                            Deletearr(node.image.uri,album_img)
+                          }
+                          else{
                             setalbum_img([...album_img,node.image.uri])
-                            console.log(album_img)
-                            
+                          }
+                           
                         }}
                     >
                         <Image
-                        style={{
-                            height: 100,
-                            minWidth: 100,
-                            flex: 1
-                        }}
-                        resizeMode="cover"
-                        source={{
-                            uri:node.image.uri,
-                        }}
+                          style={{
+                              height: 100,
+                              minWidth: 100,
+                              flex: 1
+                          }}
+                          resizeMode="cover"
+                          source={{
+                              uri:node.image.uri,
+                          }}
                         />
+                        {
+                          Check(node.image.uri,album_img)&&
+                          <View style={{
+                            height:20,
+                            width:20,
+                            backgroundColor:"white",
+                            position:"absolute",
+                            justifyContent:"center",
+                            alignItems:"center",
+                            borderRadius:500/2,
+                            borderWidth:1,
+                            bottom:5,
+                            padding:5,
+                            right:5}}>
+                            <View style={{height:10,width:10,backgroundColor:"blue",borderRadius:500/2}}></View>
+                          </View>
+                        }
                     </TouchableOpacity>
                     )
                 )
                 }
             </View>
             </ScrollView>
-            {
-              check&&
-              <Animated.View style={{
-                height:toggle,
-                width:"100%",
-                backgroundColor:"#A9A9A9",
-                position:"absolute",
-                justifyContent:"center",
-                bottom:0,
-                alignItems:"flex-end",
-                padding:20
-              }}>
-                <TouchableOpacity
-                  onPress={()=>{
-                    choseimage()
-                    console.log("hoang")
-                    savePicture()
-                    // console.log(album_img)
-                  }}
-                >
-                <Icon
-                    name='checkmark-outline'
-                    size={30}
-                    color="black"
-                />
-                </TouchableOpacity>
-              </Animated.View>
-            }
         </View>
   );
 };

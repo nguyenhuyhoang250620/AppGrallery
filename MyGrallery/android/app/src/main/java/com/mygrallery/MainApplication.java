@@ -13,7 +13,6 @@ import com.mygrallery.newarchitecture.MainApplicationReactNativeHost;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.reactnativecommunity.cameraroll.CameraRollPackage;
-import com.reactnative.ivpusic.imagepicker.PickerPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 

@@ -5,7 +5,8 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
-  Image
+  Image,
+  Platform
 } from 'react-native'
 import React,{useState,useEffect} from 'react'
 import CustomButtonAddAlbum from '../../components/CustomButtonAddAlbum'
@@ -13,6 +14,9 @@ import CustomViewAdd from '../../components/CustomViewAdd'
 import CustomViewChoose from '../../components/CustomViewChoose'
 import CustomViewAlbum from '../../components/CustomViewAlbum'
 import CameraRoll, { getAlbums } from '@react-native-community/cameraroll'
+import CustomImageIOS from '../../components/CustomImageIOS'
+import CustomImageAndroid from '../../components/CustomImageAndroid'
+
 
 
 const AlbumScreen = () => {
@@ -46,14 +50,18 @@ const AlbumScreen = () => {
   const album_img =childdata=>{
     setalbum_imgs(childdata)
   }
+
   const Text_album = childdata=>{
+    console.log(childdata)
     setname_album(childdata)
     const todo ={
       id:Math.random(),
       title:childdata,
-      count:count,
+      count:2,
       img:album_imgs
     }
+    
+    
     setData([...data,todo])
   }
  
@@ -61,45 +69,61 @@ const AlbumScreen = () => {
     const album = await CameraRoll.getAlbums({assetType:"Photos"})
     // console.log(album)
     
-    album.map(doc=>{
-      getPhotos(doc.title)
-      setCount(doc.count)
-    })
-    setData(album) 
+    getPhotos(album)
+   
 
   }
-  const getPhotos = async(name)=>{
-    const photos = await CameraRoll.getPhotos({
-      first:1,
-      groupName:name,
-      groupTypes:"Library"
-    })  
-    photos.edges.map(doc=>{
-      
-      // console.log(doc.node.image.uri)
-      arr.push(doc.node.image.uri)
-      
+  const getPhotos =(album)=>{
+    album.map(async doc=>{
+      const photos = await CameraRoll.getPhotos({
+        first:1,
+        groupName:doc.title,
+        groupTypes:"Library"
+      }) 
+      photos.edges.map( item=>{ 
+        // console.log(item.node.image.uri)  
+        // console.log(doc.title)
+        // console.log(doc.count)
+        
+        var todo ={
+          id:Math.random(),
+          title:doc.title,
+          count:doc.count,
+          uri:item.node.image.uri
+        }
+        arr.push(todo)
+        if(arr.length==album.length){
+          setData(arr)
+        }
+      })
+      // console.log(data)
     })
-    setAvatar([...avatar,...arr])
     
+    
+   
+       
   }
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={[styles.container,{flexWrap:"wrap",flexDirection:"row"}]}>
           {
-            avatar.map((item,index)=>(
+            data.map((item,index)=>(
               <View key={index} style={{padding:10}}>
                 <TouchableOpacity
                   onPress={()=>{
                     setShow_Img(true)
                     setId_album(index)
                     setname_album(item.title)
-                    console.log(avatar)
+                    console.log(item)
                   }}
                 >
+                  {
+                    Platform.OS=="ios"
+                    ? <CustomImageIOS borderRadius={15} uri={item.uri} />
+                    : <CustomImageAndroid borderRadius={15} uri={item.uri} />
+                  }
                   
-                  <Image style={styles.container_album} source={{uri:item}} />
                   <Text numberOfLines={2} style={{width:100,textAlign:"center",paddingTop:4,fontSize:15,fontWeight:"bold"}}>{item.title}</Text>
                   <Text style={{fontSize:12,color:"grey",textAlign:"center"}}>{item.count}</Text>
                 </TouchableOpacity>

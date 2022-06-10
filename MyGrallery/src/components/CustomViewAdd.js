@@ -26,7 +26,7 @@ const CustomViewAdd = (props) => {
         props.parentCallback(false)
     }
    
-    const SaveAsync = async()=>{
+    const SaveAsync = ()=>{
         if(colors==true){
             props.SaveCallBack(true)
             props.parentCallback(false)

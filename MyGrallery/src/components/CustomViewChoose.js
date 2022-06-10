@@ -14,6 +14,7 @@ import {
 import RNFS  from 'react-native-fs'
 import CameraRoll from '@react-native-community/cameraroll';
 import Icon from 'react-native-vector-icons/Ionicons'
+import CustomImageIOS from '../components/CustomImageIOS'
 Icon.loadFont();
 
 const CustomViewChose = (props) => {
@@ -39,20 +40,28 @@ const CustomViewChose = (props) => {
   const album_imgs = ()=>{
     props.album_img(album_img)
   }
-
+  
+ 
   const getPhotos = async () => {
     const photos = await CameraRoll.getPhotos({
-      first: 10,
+      first:500,
     })
     setNodes(photos.edges.map(edge => edge.node))
   }
   const checkAndroidPermission = async () => {
     try {
-      const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
-      await PermissionsAndroid.request(permission);
-      Promise.resolve();
-    } catch (error) {
-      Promise.reject(error);
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'My App Storage Permission',
+          message: 'My App needs access to your storage ' +
+            'so you can save your photos',
+        },
+      );
+      return granted;
+    } catch (err) {
+      console.error('Failed to request permission ', err);
+      return null;
     }
 };
 const changeURL =(img)=>{
@@ -70,14 +79,16 @@ const changeURL =(img)=>{
   return destination;
 }
 
-const savePicture = async () => {
+const savePicture = () => {
     if (Platform.OS === 'android'){
-      await checkAndroidPermission();
+       checkAndroidPermission();
     }
     album_img.map( doc=>{
       CameraRoll.save(Platform.OS == "ios"? changeURL(doc):doc,{type:"auto",album:props.name_album}).
-      then((res)=>{console.log("save img...",res);}).
+       then((res)=>{console.log("save img...",res)  
+      ;}).
       catch((err)=>{console.log("err for save img...",err);})
+     
     })
     
     
@@ -132,7 +143,6 @@ const Check=(img,array)=>{
                 </View>
                 <TouchableOpacity
                   onPress={()=>{
-                    choseimage()
                     savePicture()
                     console.log(album_img)
                   }}
@@ -165,8 +175,7 @@ const Check=(img,array)=>{
                         minWidth:100,
                         flex: 1,
                         padding:10,
-                        borderWidth:0.5,
-                        backgroundColor:"white"
+                        marginVertical:10
                         }}
                         onPress={() => {
                           if(Check(node.image.uri,album_img)){
@@ -178,17 +187,24 @@ const Check=(img,array)=>{
                            
                         }}
                     >
-                        <Image
-                          style={{
-                              height: 100,
-                              minWidth: 100,
-                              flex: 1
-                          }}
-                          resizeMode="cover"
-                          source={{
-                              uri:node.image.uri,
-                          }}
+                      {
+                        Platform.OS=='ios'
+                        ?<CustomImageIOS
+                            uri={node.image.uri}                        
                         />
+                        :<Image
+                        style={{
+                            height: 100,
+                            minWidth: 100,
+                            flex: 1
+                        }}
+                        resizeMode="cover"
+                        source={{
+                            uri:node.image.uri,
+                        }}
+                      />
+                      }
+                        
                         {
                           Check(node.image.uri,album_img)&&
                           <View style={{
@@ -200,9 +216,9 @@ const Check=(img,array)=>{
                             alignItems:"center",
                             borderRadius:500/2,
                             borderWidth:1,
-                            bottom:5,
+                            bottom:-18,
                             padding:5,
-                            right:5}}>
+                            right:15}}>
                             <View style={{height:10,width:10,backgroundColor:"blue",borderRadius:500/2}}></View>
                           </View>
                         }

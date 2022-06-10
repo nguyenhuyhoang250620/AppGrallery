@@ -1,18 +1,17 @@
-import { View, Text } from 'react-native'
+import { View, Text,Dimensions } from 'react-native'
 import React,{useEffect,useState} from 'react'
 import FastImage from 'react-native-fast-image'
-
-const CustomImageAndroid = (props) => {
+const { width } = Dimensions.get("window")
+const CustomImageAndroidView = (props) => {
   const [height,setHeight] = useState(0)
   return (
-  
-      <View style={{height:110,width:110,borderWidth:1,justifyContent:"center",alignItems:"center",borderRadius:props.borderRadius,}}>
+    <View style={{flex:1}}>
        <FastImage
         style={{
             height: height.height,
-            width: 100,
+            width: width,
             flex: 1,
-            maxHeight:80
+            
         }}
         resizeMode={FastImage.resizeMode.cover}
         source={{
@@ -24,13 +23,12 @@ const CustomImageAndroid = (props) => {
         onLoad={evt =>
           setHeight({
             height:
-              evt.nativeEvent.height / evt.nativeEvent.width * 100, 
+              evt.nativeEvent.height / evt.nativeEvent.width * width, 
           })}
        
         />
-      </View>
-    
+    </View>
   )
 }
 
-export default CustomImageAndroid
+export default CustomImageAndroidView

@@ -14,6 +14,10 @@ import React,{useRef,useEffect,useState} from 'react'
 import CameraRoll from '@react-native-community/cameraroll';
 import Swiper from 'react-native-swiper';
 import Icon from 'react-native-vector-icons/Ionicons'
+import CustomImageIOS from '../components/CustomImageIOS'
+import CustomImageIOSView from '../components/CustomImageIOSView'
+import CustomImageAndroid from './CustomImageAndroid';
+
 Icon.loadFont();
 
 const CustomViewAlbum = (props) => {
@@ -167,16 +171,10 @@ const CustomViewAlbum = (props) => {
                                 backgroundColor: '#333',
                             }}
                             >
-                            <Image
-                                style={{
-                                width: "100%",
-                                flex: 1,
-                                }}
-                                resizeMode="cover"
-                                source={{
-                                uri: node.image.uri
-                                }}
-                            />
+                                <CustomImageIOSView
+                                    uri={node.image.uri}
+                                />
+                                 
                             
                             </View>
                         )
@@ -231,18 +229,19 @@ const CustomViewAlbum = (props) => {
                                 key={index}
                                 style={{
                                 flex: 1,
-                                flexDirection: 'row',
-                                flexWrap: 'wrap',
+                                flexDirection:"row"
                                 }}
                             >
                                 <TouchableOpacity
 
                                     style={{
-                                    height: 200,
-                                    minWidth: 100,
+                                    height: 100,
+                                    width: 100,
+                                    maxWidth:100,
                                     flex: 1,
                                     padding:10,
-                                    borderWidth:0.5
+                                    marginVertical:10,
+                                    
                                     }}
                                     onPress={() => {
                                     setDetailViewVisibility(true)
@@ -251,17 +250,17 @@ const CustomViewAlbum = (props) => {
                                     
                                     }}
                                 >
-                                    <Image
-                                    style={{
-                                        height: 100,
-                                        minWidth: 100,
-                                        flex: 1
-                                    }}
-                                    resizeMode="cover"
-                                    source={{
-                                        uri:item.image.uri
-                                    }}
-                                    />
+                                    {
+                                        Platform.OS=='ios'
+                                        ?<CustomImageIOS
+                                            uri={item.image.uri}  
+                                        />
+                                        :
+                                        <CustomImageAndroid
+                                            uri={item.image.uri}  
+                                        />
+                                    }
+                                    
                                 </TouchableOpacity>
                             </View>
                         ))

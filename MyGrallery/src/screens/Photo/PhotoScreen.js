@@ -21,6 +21,8 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import FastImage from 'react-native-fast-image'
 import CustomImageAndroid from '../../components/CustomImageAndroid'
 import CustomImageIOS from '../../components/CustomImageIOS'
+import CustomImageIOSView from '../../components/CustomImageIOSView';
+import CustomImageAndroidView from '../../components/CustomImageAndroidView';
 
 const { width, height } = Dimensions.get("window")
 Icon.loadFont();
@@ -81,6 +83,7 @@ const PhotoScreen = () => {
     setNodes(photos.edges.map(edge => edge.node))
     setIsload(false)
   }
+  
 
   const getTime = (item)=>{
     nodes.map((doc,index)=>{
@@ -151,17 +154,16 @@ const PhotoScreen = () => {
                         backgroundColor: '#333',
                       }}
                     >
-                      <Image
-                        style={{
-                          width: "100%",
-                          flex:1,
+                      {
+                        Platform.OS=='ios'
+                        ?<CustomImageIOSView
+                          uri = {node.image.uri}
+                        />
+                        :<CustomImageIOSView
+                          uri = {node.image.uri}
+                        />
+                      }
                       
-                        }}
-                        resizeMode="cover"
-                        source={{
-                          uri: node.image.uri
-                        }}
-                      />
                       
                     </View>
                   )
@@ -228,7 +230,7 @@ const PhotoScreen = () => {
                         minWidth: 100,
                         flex: 1,
                         padding:10,
-                        borderWidth:0.5
+                        marginVertical:10
                       }}
                       onPress={() => {
                         setDetailViewVisibility(true)

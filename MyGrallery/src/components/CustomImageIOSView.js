@@ -12,7 +12,7 @@ const CustomImageIOSView = (props) => {
       },
       error => console.log(error)
     );
-    console.log(heights.height)
+    
   },[])
   return (
     <View style={{flex:1}}>

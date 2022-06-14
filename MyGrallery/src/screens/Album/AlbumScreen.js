@@ -49,17 +49,30 @@ const AlbumScreen = () => {
   }
   const album_img =childdata=>{
     setalbum_imgs(childdata)
+    console.log("hoang")
+    // console.log(album_imgs)
   }
 
   const Text_album = childdata=>{
-    console.log(childdata)
     setname_album(childdata)
+    // const todo ={
+    //   id:Math.random(),
+    //   title:childdata,
+    //   count:2,
+    //   img:album_imgs
+    // }
+    
+    
+    // setData([...data,todo])
+  }
+  const Create_album = childdata=>{
     const todo ={
       id:Math.random(),
-      title:childdata,
-      count:2,
-      img:album_imgs
+      title:childdata.title,
+      count:childdata.count,
+      uri:childdata.uri
     }
+    
     
     
     setData([...data,todo])
@@ -84,7 +97,8 @@ const AlbumScreen = () => {
         // console.log(item.node.image.uri)  
         // console.log(doc.title)
         // console.log(doc.count)
-        
+        setCount(doc.count)
+        setname_album(doc.title)
         var todo ={
           id:Math.random(),
           title:doc.title,
@@ -114,7 +128,6 @@ const AlbumScreen = () => {
                   onPress={()=>{
                     setShow_Img(true)
                     setId_album(index)
-                    setname_album(item.title)
                     console.log(item)
                   }}
                 >
@@ -123,7 +136,6 @@ const AlbumScreen = () => {
                     ? <CustomImageIOS borderRadius={15} uri={item.uri} />
                     : <CustomImageAndroid borderRadius={15} uri={item.uri} />
                   }
-                  
                   <Text numberOfLines={2} style={{width:100,textAlign:"center",paddingTop:4,fontSize:15,fontWeight:"bold"}}>{item.title}</Text>
                   <Text style={{fontSize:12,color:"grey",textAlign:"center"}}>{item.count}</Text>
                 </TouchableOpacity>
@@ -136,11 +148,11 @@ const AlbumScreen = () => {
       <CustomButtonAddAlbum onPress={()=>setShow(!show)}/>
       {
         show_chose&&
-        <CustomViewChoose parencallbacks={SaveCallBacks} album_img={album_img} name_album={name_album}  />
+        <CustomViewChoose parencallbacks={SaveCallBacks} album_img={album_img} name_album={name_album} create_albumCallback={Create_album} />
       }
       {
         show_img&&     
-          <CustomViewAlbum parencallback={Send_album} id_album={id_album} name_album={name_album} album_imgs={album_imgs}/>
+          <CustomViewAlbum parencallback={Send_album} id_album={id_album} name_album={name_album} album_imgs={album_imgs} length_album={count}/>
       }
       {
         show&&

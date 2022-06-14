@@ -15,6 +15,7 @@ import RNFS  from 'react-native-fs'
 import CameraRoll from '@react-native-community/cameraroll';
 import Icon from 'react-native-vector-icons/Ionicons'
 import CustomImageIOS from '../components/CustomImageIOS'
+import CustomImageAndroid from '../components/CustomImageAndroid'
 Icon.loadFont();
 
 const CustomViewChose = (props) => {
@@ -22,7 +23,7 @@ const CustomViewChose = (props) => {
 
   const [nodes, setNodes] = useState([]);
   const [album_img,setalbum_img] = useState([])
-  
+  const [count,setCount] = useState('')
 
 
   useEffect(() => {
@@ -30,21 +31,23 @@ const CustomViewChose = (props) => {
      
   }, [])
 
-  useEffect(()=>{
-    album_imgs()
-  },[album_img])
+ 
 
   const choseimage =()=>{
     props.parencallbacks(false)  
   }
-  const album_imgs = ()=>{
-    props.album_img(album_img)
+ 
+  const create_album = ()=>{
+    props.create_albumCallback({
+      title:props.name_album,
+      count:album_img.length,
+      uri:count
+    })
   }
-  
  
   const getPhotos = async () => {
     const photos = await CameraRoll.getPhotos({
-      first:500,
+      first:50,
     })
     setNodes(photos.edges.map(edge => edge.node))
   }
@@ -90,7 +93,7 @@ const savePicture = () => {
       catch((err)=>{console.log("err for save img...",err);})
      
     })
-    
+   
     
 };
 const Deletearr =(img,array)=>{
@@ -144,7 +147,8 @@ const Check=(img,array)=>{
                 <TouchableOpacity
                   onPress={()=>{
                     savePicture()
-                    console.log(album_img)
+                    create_album()
+                    choseimage()
                   }}
                 >
                 <Icon
@@ -183,8 +187,9 @@ const Check=(img,array)=>{
                           }
                           else{
                             setalbum_img([...album_img,node.image.uri])
+                            setCount(node.image.uri)
                           }
-                           
+                          
                         }}
                     >
                       {
@@ -192,17 +197,9 @@ const Check=(img,array)=>{
                         ?<CustomImageIOS
                             uri={node.image.uri}                        
                         />
-                        :<Image
-                        style={{
-                            height: 100,
-                            minWidth: 100,
-                            flex: 1
-                        }}
-                        resizeMode="cover"
-                        source={{
-                            uri:node.image.uri,
-                        }}
-                      />
+                        :<CustomImageAndroid
+                            uri={node.image.uri} 
+                        />
                       }
                         
                         {

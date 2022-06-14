@@ -43,6 +43,7 @@ const CustomViewAlbum = (props) => {
     }else{
       getPhotos()
     }
+    console.log(props.length_album)
   }, [])
 
     const checkPermission = async () => {
@@ -127,7 +128,7 @@ const CustomViewAlbum = (props) => {
                 </TouchableOpacity>
                 <View style={{paddingHorizontal:20}}>
                     <Text style={{fontSize:16,fontWeight:"bold"}}>{props.name_album}</Text>
-                    <Text style={{fontSize:12,color:"grey"}}>0 muc</Text>
+                    <Text style={{fontSize:12,color:"grey"}}>{props.length_album}</Text>
                 </View>
             </View>
             {

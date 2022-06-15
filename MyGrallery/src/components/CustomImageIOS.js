@@ -30,13 +30,13 @@ const CustomImageIOS = (props) => {
       justifyContent:"center",
       alignItems:"center",
       borderRadius:props.borderRadius,
-      borderColor:"#E0E0E0",
+      borderColor:"white",
       backgroundColor:"white"
       }}>
        <Image
         style={{
-            width:100*0.9,
-            height:height.height,
+            width:97,
+            height:98,
             maxHeight:100,
             borderRadius:props.borderRadius_img
             

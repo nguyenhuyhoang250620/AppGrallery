@@ -34,7 +34,10 @@ const PhotoScreen = () => {
   const toggle = useRef(new Animated.Value(0)).current
   const [date,setDate] = useState([])
   const [tong,setTong] = useState([])
+  const [dele,setDele] = useState(false)
 
+
+  //hiển thị xoá
   const showdelete=(check)=>{
     check?
     Animated.timing(toggle,{
@@ -46,7 +49,12 @@ const PhotoScreen = () => {
     toggle.setValue(0)
     
   }
-  useEffect(() => {
+  useEffect(()=>{
+    getPhotos()
+    console.log("haong")
+  },[isload])
+  useEffect(()=>{
+    console.log("huy")
     if(Platform.OS === 'android'){
       checkPermission()
       .then(() => {
@@ -54,14 +62,10 @@ const PhotoScreen = () => {
       })
     }else{
       getPhotos()
-    }    
-  },[])
-  useEffect(()=>{
-    getPhotos()
-    console.log("haong")
-  },[isload])
-  
+    }   
+  },[dele])
 
+  //check quyền sử dụng thư viện android
   const checkPermission = async () => {
     const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
 
@@ -78,7 +82,7 @@ const PhotoScreen = () => {
     return status === 'granted';
   }
 
-
+// lấy ảnh từ thư viện lên app
   const getPhotos = async () => {
     const photos = await CameraRoll.getPhotos({
       first: 76,
@@ -96,7 +100,7 @@ const PhotoScreen = () => {
       chose.map(item=>{
         if(changeTime(item.timestamp)===doc){
           choses.push(item.image.uri)
-        } 
+        }
       })
       var a = {
         title:doc,
@@ -106,21 +110,21 @@ const PhotoScreen = () => {
     })
     setTong(all)
     setIsload(false)
+    
   }
+  // chuyển đổi thời gian từ timestamp sang ngày, tháng, năm....
   const changeTime = (timestamp)=>{
-    const date = new Date(timestamp*1000).getUTCFullYear()
-    return date;
-  }
-  const changeTimeYear = (timestamp)=>{
-    const month = new Date(timestamp*1000).getMonth()+1
-    return month
+    const year = new Date(timestamp*1000).getUTCFullYear()
+    return year;
   }
  
+  //sắp xếp thời gian theo timastamp
   const sortTime=(arr)=>{
     arr.sort((a, b) => (a.timestamp < b.timestamp) ? 1 : -1)
     return arr
   }
 
+  //xoá các phần tử trùng nhau trong mảng
   const unique_arr=(arr)=> {
     let newArr = arr.reduce(function (accumulator, element) {
         if (accumulator.indexOf(element) === -1) {
@@ -131,15 +135,17 @@ const PhotoScreen = () => {
     return newArr
   }
 
+  //xoá một hình ảnh bất kì
   const deletes =(id)=>{
-    console.log(tong)
     CameraRoll.deletePhotos([id]).
     then(()=>{
-      setNodes(nodes.filter(item => item.image.uri!== id))
+      setDele(!dele)
       showdelete(false)
     })
     
   }
+
+  //lấy thời gian từng hình ảnh
   const getTime = (item)=>{
     nodes.map((doc,index)=>{
       if(index===item){
@@ -162,15 +168,15 @@ const PhotoScreen = () => {
     })
   }
   const renderItem =({item})=>{
-    return(
-      <FlatList
-        data={item}
-        keyExtractor={(item,index)=>index.toString()}
-        renderItem={renderItem2}
-        numColumns={4}
-      />
-    )
-}
+      return(
+        <FlatList
+          data={item}
+          keyExtractor={(item,index)=>index.toString()}
+          renderItem={renderItem2}
+          numColumns={4}
+        />
+      )
+  }
   const renderItem2 =({item,index})=>{
       return(
         <TouchableOpacity
@@ -178,11 +184,13 @@ const PhotoScreen = () => {
               onPress={() => {
                 setDetailViewVisibility(true)
                 getTime(index)
-                setSelectedIndex(index)                           
+                
+                console.log(nodes.length)
+                setSelectedIndex(index+1)                           
               }}
               onLongPress={()=>{
                 showdelete(true)
-                // console.log(item.image.uri)
+                console.log(index)
                 setId(item)
               }}
             >

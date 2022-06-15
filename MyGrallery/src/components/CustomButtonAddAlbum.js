@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View,TouchableOpacity } from 'react-native'
 import React from 'react'
+import Icon from 'react-native-vector-icons/Ionicons'
+Icon.loadFont();
+
 
 const CustomButtonAddAlbum = (props) => {
   return (

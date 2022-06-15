@@ -6,11 +6,11 @@ const CustomImageAndroid = (props) => {
   const [height,setHeight] = useState(0)
   return (
   
-      <View style={{height:110,width:110,borderWidth:1,justifyContent:"center",alignItems:"center",borderRadius:props.borderRadius,}}>
+      <View style={{height:110,justifyContent:"center",alignItems:"center",borderRadius:props.borderRadius,}}>
        <FastImage
         style={{
             height: height.height,
-            width: 100,
+            width: 95,
             flex: 1,
             maxHeight:80
         }}

@@ -1,11 +1,8 @@
 
-   
 import React, { useEffect, useState,useRef } from 'react';
 import {
-  Image,
   PermissionsAndroid,
   SafeAreaView,
-  ScrollView,
   TouchableOpacity,
   View,
   Text,
@@ -14,20 +11,18 @@ import {
   Dimensions,
   Animated,
   FlatList,
+  SectionList
 } from 'react-native';
 
-import CameraRoll, { getAlbums } from '@react-native-community/cameraroll';
+import CameraRoll from '@react-native-community/cameraroll';
 import Swiper from 'react-native-swiper';
 import Icon from 'react-native-vector-icons/Ionicons'
-import FastImage from 'react-native-fast-image'
 import CustomImageAndroid from '../../components/CustomImageAndroid'
 import CustomImageIOS from '../../components/CustomImageIOS'
 import CustomImageIOSView from '../../components/CustomImageIOSView';
 import CustomImageAndroidView from '../../components/CustomImageAndroidView';
-
 const { width, height } = Dimensions.get("window")
 Icon.loadFont();
-
 const PhotoScreen = () => {
 
   const [nodes, setNodes] = useState([]);
@@ -39,7 +34,7 @@ const PhotoScreen = () => {
   const toggle = useRef(new Animated.Value(0)).current
   const [date,setDate] = useState([])
   const [tong,setTong] = useState([])
-  var arr = []
+
   const showdelete=(check)=>{
     check?
     Animated.timing(toggle,{
@@ -61,19 +56,12 @@ const PhotoScreen = () => {
       getPhotos()
     }    
   },[])
-
-  // useEffect(()=>{
-  //   Image.getSize(
-  //     "ph://43AD6930-13E6-408D-BA7C-6F8D8ED37DD5/L0/001",
-  //     (srcWidth, srcHeight) => {
-  //       const ratio = Math.min(100 / srcWidth, 100 / srcHeight);
-  //       setTest({ height: srcHeight * ratio });
-  //     },
-  //     error => console.log(error)
-  //   );
-  //   console.log(test)
-  // },[])
+  useEffect(()=>{
+    getPhotos()
+    console.log("haong")
+  },[isload])
   
+
   const checkPermission = async () => {
     const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
 
@@ -90,35 +78,50 @@ const PhotoScreen = () => {
     return status === 'granted';
   }
 
+
   const getPhotos = async () => {
     const photos = await CameraRoll.getPhotos({
       first: 76,
-    })
-    
+    }) 
     setNodes(sortTime(photos.edges.map(edge => edge.node)))
-  
-    setIsload(false)
     var arr = []
     photos.edges.map(item=>{
       arr.push(changeTime(item.node.timestamp))
     })
     setDate(unique_arr(arr))
+    var chose = photos.edges.map(doc=>doc.node)
+    var all = []
+    date.forEach(doc=>{
+      var choses = []
+      chose.map(item=>{
+        if(changeTime(item.timestamp)===doc){
+          choses.push(item.image.uri)
+        } 
+      })
+      var a = {
+        title:doc,
+        data:[choses]
+      }
+      all.push(a)
+    })
+    setTong(all)
+    setIsload(false)
   }
+  const changeTime = (timestamp)=>{
+    const date = new Date(timestamp*1000).getUTCFullYear()
+    return date;
+  }
+  const changeTimeYear = (timestamp)=>{
+    const month = new Date(timestamp*1000).getMonth()+1
+    return month
+  }
+ 
   const sortTime=(arr)=>{
     arr.sort((a, b) => (a.timestamp < b.timestamp) ? 1 : -1)
     return arr
   }
 
-  const deletes = (id)=>{
-    CameraRoll.deletePhotos([id]).
-    then(()=>{
-      setNodes(nodes.filter(item => item.image.uri!== id))
-      showdelete(false)
-    })
-    
-  }
-
-const unique_arr=(arr)=> {
+  const unique_arr=(arr)=> {
     let newArr = arr.reduce(function (accumulator, element) {
         if (accumulator.indexOf(element) === -1) {
             accumulator.push(element)
@@ -126,6 +129,16 @@ const unique_arr=(arr)=> {
         return accumulator
     }, [])
     return newArr
+  }
+
+  const deletes =(id)=>{
+    console.log(tong)
+    CameraRoll.deletePhotos([id]).
+    then(()=>{
+      setNodes(nodes.filter(item => item.image.uri!== id))
+      showdelete(false)
+    })
+    
   }
   const getTime = (item)=>{
     nodes.map((doc,index)=>{
@@ -148,35 +161,17 @@ const unique_arr=(arr)=> {
       }
     })
   }
-  
-  const changeTime = (timestamp)=>{
-    const dates = new Date(timestamp*1000).getUTCFullYear()
-    return dates;
-  }
-
-const check_arr=(element,arr)=>{
-    let check = arr.indexOf(element);
-    return check == -1 ? false: true
-  }
-  const renderItem = ({item,index})=>{
+  const renderItem =({item})=>{
     return(
-      <View>
-        <Text>{item}</Text>
-          <FlatList
-            data={sortTime(nodes)}
-            keyExtractor={(item,index)=>index.toString()}
-            renderItem={renderItem2}
-            numColumns={4}
-            style={{
-              backgroundColor:"white"
-            }}
-          />
-          
-      </View>
+      <FlatList
+        data={item}
+        keyExtractor={(item,index)=>index.toString()}
+        renderItem={renderItem2}
+        numColumns={4}
+      />
     )
-  }
+}
   const renderItem2 =({item,index})=>{
-    if(changeTime(item.timestamp)=='2022'){
       return(
         <TouchableOpacity
               key={index}
@@ -188,23 +183,21 @@ const check_arr=(element,arr)=>{
               onLongPress={()=>{
                 showdelete(true)
                 // console.log(item.image.uri)
-                setId(item.image.uri)
-                console.log(changeTime(item.timestamp))
+                setId(item)
               }}
             >
               {
                 Platform.OS =='ios'
                 ?<CustomImageIOS
-                  uri={item.image.uri}
+                  uri={item}
                 />
                 :
                 <CustomImageAndroid
-                  uri = {item.image.uri}
+                  uri = {item}
                 />
               }
-          </TouchableOpacity>
+        </TouchableOpacity>
       )
-    }
   }
 
 
@@ -294,62 +287,17 @@ const check_arr=(element,arr)=>{
           </View>
         )
         : (
-          <FlatList
-            data={date}
-            keyExtractor={(item,index)=>index.toString()}
+          <SectionList
+            sections={tong}
+            keyExtractor={(item, index) => item + index}
             renderItem={renderItem}
-            numColumns={1}
-            style={{
-              backgroundColor:"white"
-            }}
+            stickySectionHeadersEnabled={false}
+            renderSectionHeader={({ section: { title } }) => (
+              <View>
+                <Text style={{padding:10,color:"black",fontWeight:"600"}}>year {title}</Text>
+              </View>
+            )}
           />
-          // <ScrollView>
-          // <View>
-          //   <View
-          //     style={{
-          //       flex: 1,
-          //       flexDirection:"row",
-          //       flexWrap:"wrap"
-          //     }}
-          //   >
-          //     {
-          //       nodes.map(
-          //         (node, index) => (
-          //           <TouchableOpacity
-          //            key={index}
-          //             style={{
-          //               minWidth: 100,
-          //               flex: 1,  
-          //               alignItems:"center"                
-          //             }}
-          //             onPress={() => {
-          //               setDetailViewVisibility(true)
-          //               getTime(index)
-          //               setSelectedIndex(index)                           
-          //             }}
-          //             onLongPress={()=>{
-          //               showdelete(true)
-          //               console.log(node.image.uri)
-          //               setId(node.image.uri)
-          //             }}
-          //           >
-          //             {
-          //               Platform.OS =='ios'
-          //               ?<CustomImageIOS
-          //                 uri={node.image.uri}
-          //               />
-          //               :
-          //               <CustomImageAndroid
-          //                 uri = {node.image.uri}
-          //               />
-          //             }
-          //           </TouchableOpacity>
-          //         )
-          //       )
-          //     }
-          //   </View>
-          // </View>
-          // </ScrollView>
         )
       }
    

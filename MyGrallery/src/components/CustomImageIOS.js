@@ -23,7 +23,16 @@ const CustomImageIOS = (props) => {
     // console.log(props.uri)
   },[])
   return (
-    <View style={{height:100,width:98,borderWidth:0.5,justifyContent:"center",alignItems:"center",borderRadius:props.borderRadius,borderColor:"#E0E0E0",backgroundColor:"white"}}>
+    <View style={{
+      height:100,
+      width:98,
+      borderWidth:0.5,
+      justifyContent:"center",
+      alignItems:"center",
+      borderRadius:props.borderRadius,
+      borderColor:"#E0E0E0",
+      backgroundColor:"white"
+      }}>
        <Image
         style={{
             width:100*0.9,
